@@ -1,4 +1,6 @@
-# Agar.io AI Agent
+# Agar Agent
+
+> **Note:** This project was built using **Gemini 3** and **Google Antigravity** via **vibe coding**.
 
 This project is a comprehensive AI development system for Agar.io, featuring Reinforcement Learning (RL) and Supervised Fine-Tuning (SFT) pipelines. It includes a game environment, training infrastructure, backend inference servers, and a web-based frontend for visualization.
 
