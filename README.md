@@ -8,7 +8,7 @@ This project is a comprehensive AI development system for Agar.io, featuring Rei
 - **`backend/`**: Python servers (`giant_server.py`, `rl_server.py`) for serving AI models to the frontend.
 - **`frontend/`**: A web-based interface (HTML/JS/CSS) to visualize the game and agent performance.
 - **`training/`**: Training pipelines for RL and SFT, including data processing and model optimization.
-- **`models/`**: Directory for storing trained model checkpoints (excluded from repo).
+- **`models/`**: Directory for storing trained model checkpoints.
 - **`scripts/`**: Utility shell scripts for starting servers, running demos, and managing training jobs.
 - **`tests/`**: Unit tests for ensuring system stability.
 

@@ -1,0 +1,16 @@
+{
+  "sft_model_path": "models/sft_giant/best_model.pt",
+  "total_timesteps": 100000,
+  "num_envs": 8,
+  "env_config": {
+    "world_size": 6000,
+    "food_count": 1000,
+    "num_opponents": 5,
+    "max_steps": 5000,
+    "difficulty": "medium",
+    "target_score": 300
+  },
+  "learning_rate": 0.0001,
+  "device": "auto",
+  "start_time": "2025-11-19T20:23:37.594525"
+}
