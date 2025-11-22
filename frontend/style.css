@@ -1,0 +1,456 @@
+:root {
+    --primary-color: #ff4757;
+    --bg-color: #f0f2f5;
+    --text-color: #2f3542;
+    --overlay-bg: rgba(255, 255, 255, 0.9);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #f0f0f0;
+    /* Light grid background */
+    background-image:
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    /* Let clicks pass through to canvas when playing */
+}
+
+#score-board {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: auto;
+}
+
+#start-screen,
+#game-over-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: var(--overlay-bg);
+    padding: 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+    z-index: 20;
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #57606f;
+}
+
+button {
+    padding: 15px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Outfit', sans-serif;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* AI Control Panel */
+.ai-control-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: auto;
+    min-width: 200px;
+    z-index: 15;
+}
+
+.ai-control-panel h3 {
+    margin-bottom: 15px;
+    color: #2f3542;
+    font-size: 18px;
+}
+
+.ai-control-panel .mode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.ai-control-panel .mode-toggle span {
+    color: #2f3542;
+    font-size: 14px;
+}
+
+.ai-control-panel .ai-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-control-panel button {
+    width: 100%;
+}
+
+.panel-header {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#mode-label {
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.small-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    margin: 5px 0;
+    width: 100%;
+}
+
+#training-status {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(46, 213, 115, 0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    text-align: center;
+    color: #2ed573;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--primary-color);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+/* Training Modal */
+#training-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 28px;
+    color: var(--primary-color);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 36px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--primary-color);
+    transform: none;
+    box-shadow: none;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.metrics-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    flex: 1;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    text-align: center;
+}
+
+.metric-card:nth-child(2) {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.metric-card:nth-child(3) {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.metric-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.chart-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 15px;
+    height: 300px;
+}
+
+#reward-chart {
+    max-height: 260px;
+}
+
+/* AI Type Selector */
+.ai-type-selector {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.ai-type-selector label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.ai-type-selector select {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Outfit', sans-serif;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.ai-type-selector select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* AI Info */
+.ai-info {
+    background: rgba(46, 213, 115, 0.1);
+    border: 2px solid rgba(46, 213, 115, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #2ed573;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Phase Distribution Styles */
+.phase-distribution {
+    margin-top: 20px;
+}
+
+.phase-distribution h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.phase-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.phase-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.phase-label {
+    min-width: 120px;
+    font-size: 13px;
+    color: #666;
+}
+
+.bar-container {
+    flex: 1;
+    height: 24px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.5s ease;
+}
+
+.bar-early {
+    background: linear-gradient(90deg, #ffa502, #ff6348);
+}
+
+.bar-mid {
+    background: linear-gradient(90deg, #1e90ff, #5352ed);
+}
+
+.bar-late {
+    background: linear-gradient(90deg, #2ed573, #7bed9f);
+}
+
+.phase-count {
+    min-width: 40px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--text-color);
+}

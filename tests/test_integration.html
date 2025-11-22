@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giant Agent Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff4757;
+        }
+        button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #ff6b81;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #ff4757;
+            border-radius: 5px;
+        }
+        pre {
+            background: #2f3542;
+            color: #f1f2f6;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        .status.ok {
+            background: #2ed573;
+            color: white;
+        }
+        .status.error {
+            background: #ff4757;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎮 Giant Agent Integration Test</h1>
+
+        <h2>Test Giant Agent API</h2>
+        <button onclick="testHealth()">Test Health Check</button>
+        <button onclick="testAction()">Test Action Decision</button>
+        <button onclick="testStats()">Test Stats</button>
+        <button onclick="testAnalyze()">Test Analyze</button>
+
+        <div id="result" class="result" style="display:none;">
+            <h3>Result:</h3>
+            <pre id="result-content"></pre>
+        </div>
+    </div>
+
+    <script>
+        const GIANT_SERVER_URL = 'http://localhost:5002';
+
+        function showResult(data, status = 'ok') {
+            const resultDiv = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+
+            resultDiv.style.display = 'block';
+            resultContent.textContent = JSON.stringify(data, null, 2);
+            resultContent.style.borderLeft = status === 'ok' ? '4px solid #2ed573' : '4px solid #ff4757';
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${GIANT_SERVER_URL}/api/health`);
+                const data = await response.json();
+                showResult(data, 'ok');
+            } catch (error) {
+                showResult({ error: error.message }, 'error');
+            }
+        }
+
+        async function testAction() {
+            try {
+                const gameState = {
+                    player_x: 2000,
+                    player_y: 2000,
+                    player_radius: 30,
+                    foods: [
+                        { x: 2100, y: 2050, radius: 5 },
+                        { x: 1950, y: 1980, radius: 4 }
+                    ],
+                    enemies: [
+                        { x: 2200, y: 2100, radius: 50, dx: -1, dy: 0 },
+                        { x: 1900, y: 1900, radius: 20, dx: 0.5, dy: 0.5 }
+                    ]
+                };
+
+                const response = await fetch(`${GIANT_SERVER_URL}/api/action`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(gameState)
+                });
+
+                const data = await response.json();
+                showResult(data, 'ok');
+            } catch (error) {
+                showResult({ error: error.message }, 'error');
+            }
+        }
+
+        async function testStats() {
+            try {
+                const response = await fetch(`${GIANT_SERVER_URL}/api/stats`);
+                const data = await response.json();
+                showResult(data, 'ok');
+            } catch (error) {
+                showResult({ error: error.message }, 'error');
+            }
+        }
+
+        async function testAnalyze() {
+            try {
+                const gameState = {
+                    player_x: 2000,
+                    player_y: 2000,
+                    player_radius: 40,
+                    foods: [
+                        { x: 2100, y: 2050, radius: 5 },
+                        { x: 2150, y: 2100, radius: 4 },
+                        { x: 1950, y: 1980, radius: 5 }
+                    ],
+                    enemies: [
+                        { x: 2200, y: 2100, radius: 30, dx: 0, dy: 0 },
+                        { x: 1700, y: 1700, radius: 50, dx: 1, dy: 1 }
+                    ]
+                };
+
+                const response = await fetch(`${GIANT_SERVER_URL}/api/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(gameState)
+                });
+
+                const data = await response.json();
+                showResult(data, 'ok');
+            } catch (error) {
+                showResult({ error: error.message }, 'error');
+            }
+        }
+
+        // Auto-test on load
+        window.onload = () => {
+            console.log('Giant Agent Integration Test loaded');
+            testHealth();
+        };
+    </script>
+</body>
+</html>

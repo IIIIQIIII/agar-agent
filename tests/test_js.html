@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Error Test</title>
+</head>
+<body>
+    <h1>Check Console for Errors</h1>
+    <div id="error-log"></div>
+
+    <script>
+        // Catch all errors
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            const errorDiv = document.getElementById('error-log');
+            errorDiv.innerHTML += `<p style="color: red;">Error: ${msg}<br>Line: ${lineNo}, Column: ${columnNo}</p>`;
+            console.error('Error:', msg, 'at line', lineNo);
+            return false;
+        };
+
+        // Load the game.js and see if it throws errors
+        const script = document.createElement('script');
+        script.src = 'game.js';
+        script.onerror = function() {
+            document.getElementById('error-log').innerHTML += '<p style="color: red;">Failed to load game.js</p>';
+        };
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>

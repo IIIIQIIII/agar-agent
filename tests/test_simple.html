@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        #gameCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #e0e0e0;
+            z-index: 1;
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff4757;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #ff6b81;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="start-screen">
+            <h1>Agar.io Clone</h1>
+            <p>Test version - Click to start</p>
+            <button id="start-btn">Play Game</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            console.log('Canvas resized:', canvas.width, 'x', canvas.height);
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Draw something on canvas to verify it works
+        ctx.fillStyle = '#ff4757';
+        ctx.fillRect(50, 50, 100, 100);
+        ctx.fillStyle = '#2ed573';
+        ctx.beginPath();
+        ctx.arc(300, 300, 50, 0, Math.PI * 2);
+        ctx.fill();
+
+        startBtn.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            alert('Game would start here!');
+        });
+
+        console.log('Test page loaded successfully');
+        console.log('Canvas:', canvas);
+        console.log('Start screen:', startScreen);
+    </script>
+</body>
+</html>

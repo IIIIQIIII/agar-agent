@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agar.io Clone</title>
+    <link rel="stylesheet" href="style.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-layer">
+            <div id="score-board">Score: <span id="score">0</span></div>
+            <div class="ai-control-panel">
+                <h3>AI Control</h3>
+
+                <div class="mode-toggle">
+                    <span id="mode-label">Manual Mode</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="ai-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="ai-type-selector" id="ai-type-selector">
+                    <label for="ai-type-select">AI Type:</label>
+                    <select id="ai-type-select">
+                        <option value="rl">RL Agent (Trained)</option>
+                        <option value="giant" selected>Giant Agent (Math)</option>
+                        <option value="sft">SFT Agent (Learned from Giant)</option>
+                        <option value="sft_post">SFT Post-Training (SFT + RL)</option>
+                    </select>
+                </div>
+
+                <div class="ai-actions" id="rl-actions">
+                    <button id="load-model-btn" class="small-btn">Load Model</button>
+                    <button id="train-btn" class="small-btn">Train (10k steps)</button>
+                    <div id="training-status"></div>
+                </div>
+
+                <div class="ai-actions" id="giant-actions">
+                    <div class="ai-info">
+                        ✅ No training needed<br>
+                        🧮 Pure mathematical modeling
+                    </div>
+                    <button id="giant-stats-btn" class="small-btn">View Stats</button>
+                </div>
+
+                <div class="ai-actions" id="sft-actions">
+                    <div class="ai-info">
+                        🧠 Learned from Giant Agent<br>
+                        🎯 Neural network inference
+                    </div>
+                    <button id="sft-load-model-btn" class="small-btn">Load SFT Model</button>
+                    <button id="sft-stats-btn" class="small-btn">View Stats</button>
+                </div>
+
+                <div class="ai-actions" id="sft-post-actions">
+                    <div class="ai-info">
+                        🚀 SFT + RL Post-Training<br>
+                        🏆 Best of both worlds
+                    </div>
+                    <button id="sft-post-load-model-btn" class="small-btn">Load Model</button>
+                    <button id="sft-post-stats-btn" class="small-btn">View Stats</button>
+                </div>
+            </div>
+            <div id="start-screen">
+                <h1>Agar.io Clone</h1>
+                <p>Eat smaller blobs to grow. Avoid larger blobs.</p>
+                <button id="start-btn">Play Game</button>
+            </div>
+            <div id="game-over-screen" class="hidden">
+                <h1>Game Over</h1>
+                <p>Final Score: <span id="final-score">0</span></p>
+                <button id="restart-btn">Play Again</button>
+            </div>
+            <div id="training-modal" class="hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Training Progress</h2>
+                        <button id="close-modal-btn" class="close-btn">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <div class="metric-label">Episodes</div>
+                                <div class="metric-value" id="episodes-count">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Avg Reward (last 10)</div>
+                                <div class="metric-value" id="avg-reward">0.0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Status</div>
+                                <div class="metric-value" id="training-state">Initializing...</div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="reward-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="giant-stats-modal" class="hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Giant Agent Statistics</h2>
+                        <button id="close-giant-modal-btn" class="close-btn">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <div class="metric-label">Total Decisions</div>
+                                <div class="metric-value" id="giant-total-decisions">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Split Rate</div>
+                                <div class="metric-value" id="giant-split-rate">0.0%</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Max Radius</div>
+                                <div class="metric-value" id="giant-max-radius">0</div>
+                            </div>
+                        </div>
+                        <div class="phase-distribution">
+                            <h3>Phase Distribution</h3>
+                            <div class="phase-bars">
+                                <div class="phase-bar">
+                                    <span class="phase-label">Early (r&lt;25)</span>
+                                    <div class="bar-container">
+                                        <div class="bar bar-early" id="bar-early" style="width: 0%"></div>
+                                    </div>
+                                    <span class="phase-count" id="count-early">0</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <span class="phase-label">Mid (25≤r&lt;60)</span>
+                                    <div class="bar-container">
+                                        <div class="bar bar-mid" id="bar-mid" style="width: 0%"></div>
+                                    </div>
+                                    <span class="phase-count" id="count-mid">0</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <span class="phase-label">Late (r≥60)</span>
+                                    <div class="bar-container">
+                                        <div class="bar bar-late" id="bar-late" style="width: 0%"></div>
+                                    </div>
+                                    <span class="phase-count" id="count-late">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="sft-stats-modal" class="hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>SFT Agent Statistics</h2>
+                        <button id="close-sft-modal-btn" class="close-btn">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <div class="metric-label">Total Decisions</div>
+                                <div class="metric-value" id="sft-total-decisions">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Split Rate</div>
+                                <div class="metric-value" id="sft-split-rate">0.0%</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Model Status</div>
+                                <div class="metric-value" id="sft-model-status">Not Loaded</div>
+                            </div>
+                        </div>
+                        <div class="phase-distribution">
+                            <h3>Action Distribution (Top 5)</h3>
+                            <div class="phase-bars" id="sft-action-bars">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="sft-post-stats-modal" class="hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>SFT Post-Training Statistics</h2>
+                        <button id="close-sft-post-modal-btn" class="close-btn">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="metrics-row">
+                            <div class="metric-card">
+                                <div class="metric-label">Total Decisions</div>
+                                <div class="metric-value" id="sft-post-total-decisions">0</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Split Rate</div>
+                                <div class="metric-value" id="sft-post-split-rate">0.0%</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-label">Model Status</div>
+                                <div class="metric-value" id="sft-post-model-status">Not Loaded</div>
+                            </div>
+                        </div>
+                        <div class="phase-distribution">
+                            <h3>Model Information</h3>
+                            <div class="ai-info" style="margin: 20px 0;">
+                                Type: <strong id="sft-post-model-type">PPO</strong><br>
+                                🎓 Initialized from SFT weights<br>
+                                🏋️ Trained with RL (Race Mode)<br>
+                                🏆 Combines imitation learning + exploration
+                            </div>
+                            <h3>Action Distribution (Top 5)</h3>
+                            <div class="phase-bars" id="sft-post-action-bars">
+                                <!-- Will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="game.js?v=2"></script>
+
+
+</body>
+
+</html>
